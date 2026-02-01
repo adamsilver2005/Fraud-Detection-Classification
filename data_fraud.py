@@ -37,7 +37,6 @@ def main():
       .query('num_steps > 1')
       .sort_values(['num_steps', 'num_transactions'], ascending=False))
 
-
     print(account_summary)
 
     mask = df['urgency_level'].isin([1, 2, 3])
