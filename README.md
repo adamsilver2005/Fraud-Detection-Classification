@@ -83,3 +83,4 @@ Each row represents a single mobile money transaction generated from the **PaySi
 - `urgency_level` is organizer-defined for this competition and is **not** part of the original PaySim dataset.
 - The exact derivation procedure is intentionally not disclosed to participants.
 - The dataset is **highly imbalanced**, reflecting real-world fraud rarity.
+
