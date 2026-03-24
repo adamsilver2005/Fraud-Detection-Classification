@@ -1,86 +1,120 @@
-# FRAUD_HackML_2026
+# Fraud Detection — Multi-Class Urgency Classification
 
-# Dataset Description
+A machine learning project that predicts the **investigation urgency level** of financial transactions, ranging from no action required to immediate intervention.
 
-Each row represents a single mobile money transaction generated from the **PaySim** simulator. All identifiers are **synthetic**. The target variable for this competition is **`urgency_level`**.
+Originally built as a team submission for **HackML 2026** on Kaggle. This repository is my personal continuation of that work, with refactored code, improved structure, and ongoing experimentation.
 
----
 
-## Files
+## Problem Statement
 
-- **`train.csv`** — Training set  
-- **`test.csv`** — Test set  
-- **`sample_submission.csv`** — Sample submission file in the correct format
+Financial institutions process millions of transactions daily, yet only a small fraction are fraudulent. Rather than asking *"Is this fraud?"*, fraud teams must decide **how urgently** a transaction needs investigation — given limited analyst resources.
 
----
+**Type:** Supervised Multi-Class Classification  
+**Target Variable:** `urgency_level` (0–3)
 
-## Columns
+| Label | Description | Business Context |
+|-------|-------------|-----------------|
+| 0 | No Action | Transaction appears legitimate |
+| 1 | Monitor | Low-risk suspicious activity |
+| 2 | Review | Likely fraud requiring analyst review |
+| 3 | Immediate Action | High-risk fraud requiring urgent response |
 
-### `id`
-- **Type:** Integer  
-- **Description:** Unique transaction identifier assigned during dataset preparation. Used to align predictions with the correct rows in `test.csv`.
-
-### `step`
-- **Type:** Integer  
-- **Description:** Time step of the transaction, where **1 step = 1 hour** since the start of the simulation.
-
-### `type`
-- **Type:** Categorical (string)  
-- **Description:** Type of transaction. Common values include:
-  - `CASH_IN`
-  - `CASH_OUT`
-  - `DEBIT`
-  - `PAYMENT`
-  - `TRANSFER`
-
-### `amount`
-- **Type:** Numeric (float)  
-- **Description:** Transaction amount in local currency.
-
-### `oldbalanceOrg`
-- **Type:** Numeric (float)  
-- **Description:** Balance of the origin account before the transaction.
-
-### `newbalanceOrg`
-- **Type:** Numeric (float)  
-- **Description:** Balance of the origin account after the transaction.
-
-### `oldbalanceDest`
-- **Type:** Numeric (float)  
-- **Description:** Balance of the destination account before the transaction. Some destination accounts may represent merchants (in the original PaySim formulation), for which certain balance fields may not apply.
-
-### `newbalanceDest`
-- **Type:** Numeric (float)  
-- **Description:** Balance of the destination account after the transaction.
-
-### `nameOrig`
-- **Type:** String  
-- **Description:** The customer initiating the transaction.
-
-### `nameDest`
-- **Type:** String  
-- **Description:** The transaction’s recipient customer.
+The dataset is intentionally **imbalanced**, reflecting real-world fraud distributions. Models are evaluated on **Macro F1-score**, which treats all urgency levels equally and prevents ignoring rare but critical fraud cases.
 
 ---
 
-## Target Variable: `urgency_level`
+## Project Structure
 
-- **Type:** Integer (categorical)  
-- **Valid values:** `{0, 1, 2, 3}`  
-- **Description:** A derived categorical label indicating the recommended urgency of fraud investigation for a transaction. Higher values represent higher risk and require faster response.
-
-### Class Meanings
-
-- **0 — No Action:** Transaction appears legitimate; no investigation required.  
-- **1 — Monitor:** Low-risk suspicious behavior; monitor for patterns or repeated activity.  
-- **2 — Review:** Likely fraudulent; should be reviewed by an analyst.  
-- **3 — Immediate Action:** High-risk fraud; requires urgent investigation or intervention.
+```
+fraud-detection-classification/
+│
+├── data/                         # Train and test
+|   outputs/                       # Outputs and catboost info
+├── jupyter_notebook_files/
+│   ├── data_preprocessing.ipynb  # Feature engineering pipeline
+│   └── model_train.ipynb         # CatBoost training and evaluation
+├── python_files/
+│   ├── data_fraud.py             # EDA and exploratory analysis
+│   └── xgtry.py                  # XGBoost model experiment
+├── requirements.txt
+├── .gitignore  
+└── README.md
+```
 
 ---
 
-## Notes
+## Dataset
 
-- `urgency_level` is organizer-defined for this competition and is **not** part of the original PaySim dataset.
-- The exact derivation procedure is intentionally not disclosed to participants.
-- The dataset is **highly imbalanced**, reflecting real-world fraud rarity.
+Each row represents a single anonymized transaction from a simulated payment system (PaySim).
 
+| Feature | Description |
+|---------|-------------|
+| `step` | Time step (1 step = 1 hour) |
+| `type` | Transaction type: `CASH_IN`, `CASH_OUT`, `DEBIT`, `PAYMENT`, `TRANSFER` |
+| `amount` | Transaction amount in local currency |
+| `oldbalanceOrg` | Origin account balance before transaction |
+| `newbalanceOrig` | Origin account balance after transaction |
+| `oldbalanceDest` | Destination account balance before transaction |
+| `newbalanceDest` | Destination account balance after transaction |
+| `nameOrig` | Anonymized origin account ID |
+| `nameDest` | Anonymized destination account ID |
+| `urgency_level` | **Target**: investigation urgency (0–3) |
+
+---
+
+## Approach
+
+Feature Engineering: (`jupyter_notebook_files/data_preprocessing.ipynb`)
+- Balance discrepancy checks per transaction type (tolerant float comparison)
+- Delta features: `deltaOrg`, `deltaDest`
+- Large transaction flag using 99.9th percentile threshold
+- Merchant destination flag
+
+Models:
+- CatBoost (`jupyter_notebook_files/model_train.ipynb`) — native categorical support, early stopping
+- XGBoost (`python_files/xgtry.py`) — one-hot encoded, time-based validation split
+
+Class Imbalance Handling:
+- Inverse-frequency class/sample weights
+- Macro F1 as the primary evaluation metric
+
+---
+
+## Results
+
+| Model | Validation Macro F1 |
+|-------|-------------------|
+| CatBoost | TBD |
+| XGBoost | TBD |
+
+---
+
+## Getting Started
+
+```bash
+# Clone the repo
+git clone https://github.com/adamsilver2005/Fraud-Detection-Classification.git
+cd Fraud-Detection-Classification
+
+# Install dependencies
+pip install -r requirements.txt
+
+# Run EDA
+python python_files/data_fraud.py
+
+# Run XGBoost model
+python python_files/xgtry.py
+```
+
+Place `train.csv` and `test.csv` inside the `data/` folder before running.
+
+---
+
+## Attribution
+
+This project originated as a team submission for **HackML 2026** on Kaggle, built collaboratively with [@Peyton289](https://github.com/Peyton289), [@TrentB159](https://github.com/TrentB159), and [ArwinSepahram](https://github.com/ArwinSepahram).
+
+This repository is my personal continuation of that work with independent improvements and refactoring.
+
+**Competition:** [FRAUD | HackML 2026](https://kaggle.com/competitions/fraud-hack-ml-2026)  
+**Reference notebook:** Aditya Shakya — [Fraud Detection](https://www.kaggle.com/code/adityashakya2454/fraud-detection/notebook)
