@@ -31,7 +31,7 @@ Financial institutions process millions of transactions daily, yet only a small 
 
 The dataset is intentionally **imbalanced**, reflecting real-world fraud distributions. Models are evaluated on **Macro F1-score**, which treats all urgency levels equally and prevents ignoring rare but critical fraud cases.
 
----
+
 
 ## Dataset
 
@@ -50,7 +50,7 @@ Each row represents a single anonymized transaction from a simulated payment sys
 | `nameDest` | Anonymized destination account ID |
 | `urgency_level` | **Target**: investigation urgency (0–3) |
 
----
+
 
 ## Project Structure
 
@@ -151,4 +151,7 @@ This project originated as a team submission for **HackML 2026** on Kaggle, buil
 This repository is my personal continuation of that work with independent improvements and refactoring.
 
 **Competition:** [FRAUD | HackML 2026](https://kaggle.com/competitions/fraud-hack-ml-2026)
+
+
+
 
