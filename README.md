@@ -7,7 +7,7 @@ Originally built as a team submission for **HackML 2026** on Kaggle. This reposi
 
 ## Problem Statement
 
-Financial institutions process millions of transactions daily, yet only a small fraction are fraudulent. Rather than asking *"Is this fraud?"*, fraud teams must decide **how urgently** a transaction needs investigation — given limited analyst resources.
+Financial institutions process millions of transactions daily, yet only a small fraction are fraudulent. Rather than asking *"Is this fraud?"*, fraud teams must decide **how urgently** a transaction needs investigation, given limited analyst resources.
 
 **Type:** Supervised Multi-Class Classification  
 **Target Variable:** `urgency_level` (0–3)
@@ -112,7 +112,7 @@ Place `train.csv` and `test.csv` inside the `data/` folder before running.
 
 ## Attribution
 
-This project originated as a team submission for **HackML 2026** on Kaggle, built collaboratively with [@Peyton289](https://github.com/Peyton289), [@TrentB159](https://github.com/TrentB159), and [ArwinSepahram](https://github.com/ArwinSepahram).
+This project originated as a team submission for **HackML 2026** on Kaggle, built collaboratively with [Peyton289](https://github.com/Peyton289), [TrentB159](https://github.com/TrentB159), and [ArwinSepahram](https://github.com/ArwinSepahram).
 
 This repository is my personal continuation of that work with independent improvements and refactoring.
 
