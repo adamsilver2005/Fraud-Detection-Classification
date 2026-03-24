@@ -1,5 +1,25 @@
+# Data files
 data/
-catboost_info/
 *.csv
+
+# Outputs
+outputs/
+
+# Model artifacts
+catboost_info/
+*.cbm
+*.pkl
+*.joblib
+
+# Python
 __pycache__/
+*.py[cod]
+*.egg-info/
+.env
+
+# Jupyter
+.ipynb_checkpoints/
+
+# OS
 .DS_Store
+Thumbs.db
