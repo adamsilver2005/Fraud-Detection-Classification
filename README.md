@@ -1,4 +1,4 @@
-# Fraud Detection — Multi-Class Urgency Classification
+# Fraud Detection: Multi-Class Urgency Classification
 
 A machine learning project that predicts the **investigation urgency level** of financial transactions, ranging from no action required to immediate intervention.
 
@@ -117,4 +117,4 @@ This project originated as a team submission for **HackML 2026** on Kaggle, buil
 This repository is my personal continuation of that work with independent improvements and refactoring.
 
 **Competition:** [FRAUD | HackML 2026](https://kaggle.com/competitions/fraud-hack-ml-2026)  
-**Reference notebook:** Aditya Shakya — [Fraud Detection](https://www.kaggle.com/code/adityashakya2454/fraud-detection/notebook)
+
