@@ -120,7 +120,7 @@ The stacked percentage chart shows that all transaction types are nearly 100% cl
 ### Amount Distributions by Urgency Level
 
 ![Amount Distributions](images/plot_amount_distributions.png)
-![Amount Box Plot](simages/plot_amount_boxplot.png)
+![Amount Box Plot](images/plot_amount_boxplot.png)
 
 Transaction amounts increase dramatically with urgency level:
 
