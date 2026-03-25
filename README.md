@@ -212,27 +212,38 @@ The project demonstrates that gradient boosting models with careful feature engi
 
 ## How to Run the Project
 
-bash
-# Clone the repo
+1. Clone the repository:
+
+```
 git clone https://github.com/adamsilver2005/Fraud-Detection-Classification.git
 cd Fraud-Detection-Classification
+```
 
-# Install dependencies
+2. Install dependencies:
+
+```
 pip install -r requirements.txt
+```
 
-# Run EDA
-python python_files/data_fraud.py
+3. Place train.csv and test.csv inside the data/ folder.
 
-# Run XGBoost model
+4. Run the EDA and preprocessing notebooks in order:
+
+```
+jupyter_notebook_files/eda.ipynb
+jupyter_notebook_files/data_preprocessing.ipynb
+```
+
+5. Train the models:
+
+```
 python python_files/xgtry.py
+jupyter_notebook_files/model_train.ipynb
+```
 
+Note: data_preprocessing.ipynb must be run before the models, as it generates train_with_new_features.csv and test_with_new_features.csv in outputs/ which are used as input for training.
 
-Place train.csv and test.csv inside the data/ folder before running.
-
-Notebooks should be run in order:
-1. data_preprocessing.ipynb — engineers new features and saves enriched CSVs to outputs/
-2. model_train.ipynb — trains CatBoost on the enriched data and outputs a submission file
-
+---
 
 ## Attribution
 
