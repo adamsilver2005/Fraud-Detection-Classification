@@ -69,6 +69,8 @@ The enriched CSVs (`train_with_new_features.csv`, `test_with_new_features.csv`) 
 
 ## Project Structure
 
+```
+
 fraud-detection-classification/
 │
 ├── data/                         # Train and test CSVs
@@ -83,7 +85,7 @@ fraud-detection-classification/
 ├── requirements.txt
 ├── .gitignore
 └── README.md
-
+```
 
 ## Exploratory Data Analysis
 
