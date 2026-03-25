@@ -94,7 +94,7 @@ Full EDA with code and visualizations is in jupyter_notebook_files/eda.ipynb.
 
 ### Class Distribution
 
-![Class Distribution](outputs/plot_class_distribution.png)
+![Class Distribution](images/plot_class_distribution.png)
 
 The dataset is extremely imbalanced. Out of 6,244,474 total transactions, 99.89% are class 0 (No Action). The three fraud classes each account for only 0.03–0.04% of the data:
 
@@ -110,7 +110,7 @@ This extreme imbalance means a naive model that always predicts class 0 would ac
 
 ### Transaction Type Breakdowns
 
-![Transaction Types](outputs/plot_transaction_types.png)
+![Transaction Types](images/plot_transaction_types.png)
 
 CASH_OUT is the most common transaction type (2,200,304), followed closely by PAYMENT (2,110,276) and CASH_IN (1,372,041). TRANSFER (521,363) and DEBIT (40,490) are far less frequent.
 
@@ -119,8 +119,8 @@ The stacked percentage chart shows that all transaction types are nearly 100% cl
 
 ### Amount Distributions by Urgency Level
 
-![Amount Distributions](outputs/plot_amount_distributions.png)
-![Amount Box Plot](outputs/plot_amount_boxplot.png)
+![Amount Distributions](images/plot_amount_distributions.png)
+![Amount Box Plot](simages/plot_amount_boxplot.png)
 
 Transaction amounts increase dramatically with urgency level:
 
@@ -138,7 +138,7 @@ All distributions are right-skewed, so a small number of very large transactions
 
 ### Correlation Heatmap
 
-![Correlation Heatmap](outputs/plot_correlation_heatmap.png)
+![Correlation Heatmap](images/plot_correlation_heatmap.png)
 
 Looking at the bottom row (urgency_level), the features most correlated with the target are:
 
@@ -156,7 +156,7 @@ Two notable multicollinearity findings: oldbalanceDest and newbalanceDest are co
 
 ### Balance Discrepancy Analysis
 
-![Balance Discrepancy](outputs/plot_balance_discrepancy.png)
+![Balance Discrepancy](images/plot_balance_discrepancy.png)
 
 For each transaction type, there is an expected relationship between the old balance, the transaction amount, and the new balance, for example, a CASH_OUT should decrease the origin balance by exactly amount. A discrepancy flags where this relationship does not hold.
 
