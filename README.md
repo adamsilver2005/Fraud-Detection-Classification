@@ -72,15 +72,17 @@ The enriched CSVs (train_with_new_features.csv, test_with_new_features.csv) are 
 ```
 fraud-detection-classification/
 │
-├── data/                         # Train and test CSVs
-├── outputs/                      # Generated files and CatBoost logs
+├── data/
+│   ├── train.csv                      # Raw training data
+│   └── test.csv                       # Raw test data
+├── images/                            # EDA and model evaluation plots
+├── outputs/                           # Generated CSVs and CatBoost logs
 ├── jupyter_notebook_files/
-│   ├── eda.ipynb                 # Exploratory data analysis and visualizations
-│   ├── data_preprocessing.ipynb  # Feature engineering pipeline
-│   └── model_train.ipynb         # CatBoost training and evaluation
+│   ├── eda.ipynb                      # Exploratory data analysis and visualizations
+│   ├── data_preprocessing.ipynb       # Feature engineering pipeline
+│   └── model_evaluation.ipynb         # Model training, evaluation, and submission
 ├── python_files/
-│   ├── data_fraud.py             # EDA and exploratory analysis
-│   └── xgtry.py                  # XGBoost model experiment
+│   └── data_fraud.py                  # EDA exploration script
 ├── requirements.txt
 ├── .gitignore
 └── README.md
@@ -181,33 +183,83 @@ The raw data is enriched with 6 new features in data_preprocessing.ipynb and sav
 
 ## Predictive Modeling
 
-Two gradient boosting models were trained and evaluated using a **time-based train/validation split** (last 20% of time steps held out for validation).
+Both models are trained and evaluated in jupyter_notebook_files/model_evaluation.ipynb, which covers training, per-class F1 breakdown, confusion matrices, feature importance, learning curves, and final submission generation.
 
-**Class Imbalance Handling:**
-- Inverse-frequency sample weights applied during training
-- Macro F1-score used as the primary evaluation metric to equally weight all urgency levels
 
-**CatBoost** (jupyter_notebook_files/model_train.ipynb)
-- Native handling of categorical features (no encoding needed)
-- Early stopping with 200-iteration patience
-- Tuned depth, L2 regularization, and learning rate
 
-**XGBoost** (python_files/xgtry.py)
-- One-hot encoded categorical features
-- Per-row sample weights for imbalance handling
-- Tuned max depth, subsampling, and regularization
+### Approach
 
-| Model | Validation Macro F1 |
-|-------|-------------------|
-| CatBoost | TBD |
-| XGBoost | TBD |
+A time-based train/validation split is used, so the last 20% of time steps are held out as a validation set. This simulates real deployment where a model is trained on historical transactions and evaluated on more recent ones it has never seen, which is more realistic than a random split.
+
+Class Imbalance Handling:
+- Inverse-frequency class weights applied during training, rare fraud classes are upweighted so the model does not simply ignore them. The resulting weights were: class 0 (0.3), class 1 (919.4), class 2 (977.7), class 3 (962.6)
+- Macro F1-score used as the primary evaluation metric to treat all urgency levels equally
+- The notebook was run on Google Colab with a T4 GPU to handle the full 6.2 million row dataset
+
+
+### CatBoost
+
+CatBoost handles the transaction type column natively as a categorical feature without any encoding. It uses early stopping with 100-iteration patience and converged at iteration 2,206.
+
+
+
+### XGBoost
+
+XGBoost requires the type column to be one-hot encoded before training. Per-row sample weights are applied to handle class imbalance, and early stopping is used. XGBoost converged at iteration 4,615, taking longer but achieving significantly better results.
+
+
+### Results
+
+![Per-Class F1](images/plot_per_class_f1.png)
+
+| Model | Macro F1 | F1 — No Action | F1 — Monitor | F1 — Review | F1 — Immediate Action |
+|-------|----------|----------------|--------------|-------------|----------------------|
+| CatBoost | 0.8189 | 0.9993 | 0.7775 | 0.5479 | 0.9510 |
+| XGBoost | 0.9636 | 0.9999 | 0.8629 | 0.9915 | 1.0000 |
+
+XGBoost outperforms CatBoost across every class, with the most dramatic difference on the Review class (0.9915 vs 0.5479). Looking at the full classification reports gives more insight into where each model struggles:
+
+CatBoost has strong recall across all classes (0.96–1.00) but poor precision on Review (0.38), meaning it correctly finds almost all Review transactions but generates many false positives, flagging legitimate transactions as needing review. This is a meaningful operational problem: fraud analysts would waste time investigating transactions that aren't actually suspicious.
+
+XGBoost achieves strong precision and recall across all classes. Its weakest point is Monitor precision (0.83), meaning roughly 1 in 6 transactions it flags for monitoring are actually legitimate, which is a much more acceptable false positive rate than CatBoost's Review precision of 0.38.
+
+
+### Confusion Matrices
+
+![Confusion Matrices](images/plot_confusion_matrices.png)
+
+Both models classify No Action transactions perfectly (1.00). For CatBoost, the main error is on Immediate Action, where 6% of Immediate Action transactions are misclassified as Review, which means genuinely urgent fraud would be downgraded to a lower priority queue. XGBoost's only notable error is 10% of Monitor transactions being misclassified as No Action, which is a less dangerous mistake since Monitor is already the lowest-risk fraud class.
+
+
+### Feature Importance
+
+![Feature Importance](images/plot_feature_importance.png)
+
+The two models weigh features very differently:
+
+CatBoost is heavily dominated by amount (74.6 importance score), with newbalanceDest (7.97), oldbalanceOrg (6.76), and step (6.40) far behind. Most engineered features, including deltaOrg, check_balanceOrg_tol, and dest_is_merchant, register near-zero importance, suggesting CatBoost learned mainly from raw transaction values.
+
+XGBoost spreads importance more evenly across features. type_CASH_IN (0.181) is the top feature, followed closely by check_balanceOrg_tol (0.127), newbalanceOrig (0.121), deltaOrg (0.117), and dest_is_merchant (0.103). This confirms that the engineered features from data_preprocessing.ipynb added genuine predictive value, and XGBoost was better able to exploit them.
+
+
+### Learning Curves
+
+![Learning Curves](images/plot_learning_curves.png)
+
+CatBoost's Macro F1 improves steadily from 0.06 at iteration 0 to a peak of 0.819 at iteration 2,206, with a notable jump around iteration 2,000 where it began learning the harder minority classes. Training took approximately 6 minutes 21 seconds. XGBoost's log loss drops rapidly from 1.37 in the first 500 iterations down to near 0, then continues improving slowly all the way to its best iteration at 4,615, indicating it needed significantly more trees to reach its full potential on the minority classes.
 
 
 ## Final Conclusion
 
-*To be updated after final model experiments are complete.*
+XGBoost achieved a Macro F1 of 0.964, significantly outperforming CatBoost (0.819) across all urgency levels. The key driver of this gap was XGBoost's ability to leverage the engineered features from data_preprocessing.ipynb, particularly check_balanceOrg_tol, deltaOrg, and dest_is_merchant, which together account for over 35% of XGBoost's feature importance but register near-zero in CatBoost's rankings.
 
-The project demonstrates that gradient boosting models with careful feature engineering and class imbalance handling are well-suited for fraud urgency classification. Balance discrepancy flags and delta features proved to be particularly informative signals.
+The most important finding from the feature importance analysis is that the engineered features genuinely mattered. XGBoost's top features are almost entirely derived columns rather than raw ones, validating the feature engineering work done in data_preprocessing.ipynb. CatBoost's over-reliance on the raw amount column likely explains its weaker performance on the Review class (F1 of 0.548 vs XGBoost's 0.991).
+
+The precision and recall breakdown also reveals an important operational difference between the two models. CatBoost had high recall but poor precision on the Review class (0.38), meaning it flagged many legitimate transactions as suspicious, flooding the review queue with false positives. XGBoost maintained both high precision and recall across all classes, making it far more practical for a real fraud team working with limited analyst capacity.
+
+Both models were trained on the full 6.2 million row dataset using inverse-frequency class weights (up to ~977x for the rarest class) to correct for the extreme imbalance, and run on Google Colab with a T4 GPU given the scale of the data. Both models learned to classify No Action transactions perfectly, and XGBoost achieved near-perfect scores across all four urgency levels.
+
+If this project were extended further, the most promising directions would be: experimenting with a soft-voting ensemble combining CatBoost and XGBoost predictions, testing additional engineered features such as account-level transaction frequency and rolling amount windows, and submitting to the Kaggle leaderboard to benchmark performance against other competitors.
 
 
 ## How to Run the Project
@@ -227,23 +279,15 @@ pip install -r requirements.txt
 
 3. Place train.csv and test.csv inside the data/ folder.
 
-4. Run the EDA and preprocessing notebooks in order:
+4. Run the notebooks in order:
 
 ```
 jupyter_notebook_files/eda.ipynb
 jupyter_notebook_files/data_preprocessing.ipynb
+jupyter_notebook_files/model_evaluation.ipynb
 ```
 
-5. Train the models:
-
-```
-python python_files/xgtry.py
-jupyter_notebook_files/model_train.ipynb
-```
-
-Note: data_preprocessing.ipynb must be run before the models, as it generates train_with_new_features.csv and test_with_new_features.csv in outputs/ which are used as input for training.
-
----
+Note: data_preprocessing.ipynb must be run before model_evaluation.ipynb, as it generates train_with_new_features.csv and test_with_new_features.csv in outputs/ which are used as input for model training. model_evaluation.ipynb trains on the full 6.2 million row dataset and is recommended to run on Google Colab with a GPU runtime (Runtime → Change runtime type → T4 GPU) as it may take over an hour on a standard CPU.
 
 ## Attribution
 
@@ -252,3 +296,39 @@ This project originated as a team submission for **HackML 2026** on Kaggle, buil
 This repository is my personal continuation of that work with independent improvements and refactoring.
 
 **Competition:** [FRAUD | HackML 2026](https://kaggle.com/competitions/fraud-hack-ml-2026)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
