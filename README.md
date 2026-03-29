@@ -251,6 +251,8 @@ CatBoost's Macro F1 improves steadily from 0.06 at iteration 0 to a peak of 0.81
 
 ## Final Conclusion
 
+This project set out to predict the investigation urgency level of financial transactions, not just whether fraud occurred, but how urgently it needed to be acted on. That framing makes it a more realistic and operationally useful problem than binary fraud detection, and it introduces challenges that a standard classifier would struggle with: four classes, extreme imbalance (99.89% class 0), and the need to correctly prioritize the rarest and most critical cases.
+
 XGBoost achieved a Macro F1 of 0.964, significantly outperforming CatBoost (0.819) across all urgency levels. The key driver of this gap was XGBoost's ability to leverage the engineered features from data_preprocessing.ipynb, particularly check_balanceOrg_tol, deltaOrg, and dest_is_merchant, which together account for over 35% of XGBoost's feature importance but register near-zero in CatBoost's rankings.
 
 The most important finding from the feature importance analysis is that the engineered features genuinely mattered. XGBoost's top features are almost entirely derived columns rather than raw ones, validating the feature engineering work done in data_preprocessing.ipynb. CatBoost's over-reliance on the raw amount column likely explains its weaker performance on the Review class (F1 of 0.548 vs XGBoost's 0.991).
