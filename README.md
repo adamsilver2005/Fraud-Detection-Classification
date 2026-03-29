@@ -1,4 +1,5 @@
 # Fraud Detection: Multi-Class Urgency Classification
+Python | pandas | NumPy | scikit-learn | XGBoost | CatBoost | Machine Learning | Google Colab
 
 A machine learning project that predicts the **investigation urgency level** of financial transactions, ranging from no action required to immediate intervention.
 
