@@ -129,10 +129,10 @@ Transaction amounts increase dramatically with urgency level:
 
 | Urgency Level | Mean Amount | Median Amount |
 |---|---|---|
-| 0 — No Action | 178,608 | 74,835 |
-| 1 — Monitor | 80,406 | 73,524 |
-| 2 — Review | 478,715 | 436,035 |
-| 3 — Immediate Action | 3,626,451 | 2,392,483 |
+| 0 - No Action | 178,608 | 74,835 |
+| 1 - Monitor | 80,406 | 73,524 |
+| 2 - Review | 478,715 | 436,035 |
+| 3 - Immediate Action | 3,626,451 | 2,392,483 |
 
 Class 3 (Immediate Action) transactions have a mean amount of 3.6 million, roughly 20x higher than class 0. Notably, class 1 (Monitor) has a lower mean than class 0, suggesting that low-level suspicious activity does not necessarily involve large amounts. Classes 2 and 3 show a sharp jump, indicating that high-value transactions are a strong signal for serious fraud.
 
@@ -213,7 +213,7 @@ XGBoost requires the type column to be one-hot encoded before training. Per-row 
 
 ![Per-Class F1](images/plot_per_class_f1.png)
 
-| Model | Macro F1 | F1 — No Action | F1 — Monitor | F1 — Review | F1 — Immediate Action |
+| Model | Macro F1 | F1 - No Action | F1 - Monitor | F1 - Review | F1 - Immediate Action |
 |-------|----------|----------------|--------------|-------------|----------------------|
 | CatBoost | 0.8189 | 0.9993 | 0.7775 | 0.5479 | 0.9510 |
 | XGBoost | 0.9636 | 0.9999 | 0.8629 | 0.9915 | 1.0000 |
