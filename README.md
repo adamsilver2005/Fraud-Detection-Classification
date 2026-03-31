@@ -21,7 +21,7 @@ Originally built as a team submission for **HackML 2026** on Kaggle. This reposi
 Financial institutions process millions of transactions daily, yet only a small fraction are fraudulent. Rather than asking *"Is this fraud?"*, fraud teams must decide **how urgently** a transaction needs investigation, given limited analyst resources.
 
 **Type:** Supervised Multi-Class Classification  
-**Target Variable:** urgency_level (0–3)
+**Target Variable:** urgency_level (0-3)
 
 | Label | Description | Business Context |
 |-------|-------------|-----------------|
@@ -50,7 +50,7 @@ Each row represents a single anonymized transaction from a simulated payment sys
 | newbalanceDest | Destination account balance after transaction |
 | nameOrig | Anonymized origin account ID |
 | nameDest | Anonymized destination account ID |
-| urgency_level | **Target**: investigation urgency (0–3) |
+| urgency_level | **Target**: investigation urgency (0-3) |
 
 **Engineered features (outputs/train_with_new_features.csv):**
 
@@ -58,12 +58,12 @@ After running data_preprocessing.ipynb, 6 additional columns are added to the ra
 
 | Feature | Description |
 |---------|-------------|
-| check_balanceOrg_tol | Flag — did the origin balance not update correctly for this transaction type? |
-| check_balanceDest_tol | Flag — did the destination balance not update correctly? |
-| check_Amount_Size | Flag — is this transaction in the top 0.1% by amount? |
+| check_balanceOrg_tol | Flag - did the origin balance not update correctly for this transaction type? |
+| check_balanceDest_tol | Flag - did the destination balance not update correctly? |
+| check_Amount_Size | Flag - is this transaction in the top 0.1% by amount? |
 | deltaOrg | Net change in origin account balance |
 | deltaDest | Net change in destination account balance |
-| dest_is_merchant | Flag — is the destination a merchant account? |
+| dest_is_merchant | Flag - is the destination a merchant account? |
 
 The enriched CSVs (train_with_new_features.csv, test_with_new_features.csv) are saved to outputs/ and used as input for model training.
 
@@ -103,10 +103,10 @@ The dataset is extremely imbalanced. Out of 6,244,474 total transactions, 99.89%
 
 | Urgency Level | Count | Share |
 |---|---|---|
-| 0 — No Action | 6,237,903 | 99.89% |
-| 1 — Monitor | 2,176 | 0.03% |
-| 2 — Review | 2,151 | 0.03% |
-| 3 — Immediate Action | 2,244 | 0.04% |
+| 0 - No Action | 6,237,903 | 99.89% |
+| 1 - Monitor | 2,176 | 0.03% |
+| 2 - Review | 2,151 | 0.03% |
+| 3 - Immediate Action | 2,244 | 0.04% |
 
 This extreme imbalance means a naive model that always predicts class 0 would achieve 99.89% accuracy while being completely useless for fraud detection. This is why Macro F1-score is the evaluation metric of choice, as it computes F1 independently for each class and averages them, treating all urgency levels equally regardless of how rare they are. It also means that class weights or sample weights are needed during training to prevent the model from simply ignoring the minority classes.
 
